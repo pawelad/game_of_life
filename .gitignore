@@ -18,3 +18,5 @@
 *.app
 
 build/
+bin/
+test/

@@ -9,9 +9,9 @@ typedef struct {
 } net_t;
 
 // Odczyt siatki z pliku
-net_t file_to_net( char *filename );
+net_t *file_to_net( char *filename );
 
 // Zapis siatki do pliku
-void net_to_file( net_t net, char *filename, char *dir );
+void net_to_file( net_t *net, char *filename, char *dir );
 
 #endif

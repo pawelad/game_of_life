@@ -1,13 +1,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #include "../lib/argparse.h"
 #include "gen_sym.h"
 #include "netting.h"
 #include "png.h"
 #include "rules.h"
-
+	
 #define COLOR_RED "\x1b[31m"
 #define COLOR_RESET "\x1b[0m"
 #define DEBUG_START(X) printf("\n%sDEBUG: %s %s\n",COLOR_RED,X,COLOR_RESET)
@@ -23,7 +24,7 @@ char *photo_dir   = NULL;
 char *mod_file    = NULL;
 char *mod_input   = NULL;
 
-static const char *const usage[] = { "life_sym [options]", NULL,};
+static const char *const usage[] = { "life_sym [options]", NULL, };
 
 void parse_arg( int argc, const char **argv );
 
@@ -37,10 +38,8 @@ int main( int argc, const char **argv )
 		if( argc != 0 )
 		{
 			printf("argc: %d\n", argc);
-			int i;
-			for (i = 0; i < argc; i++) {
+			for( int i= 0; i < argc; i++ )
 				printf("argv[%d]: %s\n", i, *(argv + i));
-			}
 		}
 	DEBUG_END;
 	#endif
@@ -58,52 +57,57 @@ int main( int argc, const char **argv )
 		return -1;
 	}
 
-	net_t net = file_to_net( input );
+	net_t *net = file_to_net( input );
 	net_to_file( net, input, results_dir );
 	
 	// Domyślne wartości
-	if( !results_dir ){
+	if( results_dir == NULL )
+	{
 		results_dir = malloc( 8 * sizeof(&results_dir) );
-		if( results_dir == NULL )
-		{
-			fprintf(stderr, "Nie udało się zaalokować pamięci.\n");
-			return -2;
-		}
+		assert( results_dir != NULL );
 		strcpy(results_dir, "results");
 	}
 
-	if( !photo_dir ){
+	if( photo_dir == NULL )
+	{
 		photo_dir = malloc( 4 * sizeof(&results_dir) );
-		if( photo_dir == NULL )
-		{
-			fprintf(stderr, "Nie udało się zaalokować pamięci.\n");
-			return -2;
-		}
+		assert( photo_dir != NULL );
 		strcpy(photo_dir, "gfx"); 
 	}
 
 
-	rules_t rules;
-	if( !mod_file && !mod_input )
+	rules_t *rules;
+	if( mod_file != NULL && mod_input != NULL )
 	{
 		fprintf(stderr, "Wywołałeś program jednocześnie ze ścieżką do pliku z zasadami oraz z zasadami.\n");
 		printf("\nWywołaj program z nie więcej niż jedną modyfikacją zasad.\n\n");
 		return -1;
 	}
-	else if( !mod_file )
+	else if( mod_file != NULL )
 	{
 		rules = file_to_rules( mod_file );
 		rules_to_file( rules, "rules", results_dir );
 	}
-	else if( !mod_input )
+	else if( mod_input != NULL )
 	{
 		rules = string_to_rules( mod_input );
 		rules_to_file( rules, "rules", results_dir );
 	}
 	else
-	{
 		rules = default_rules();
-	}
+
+	#ifdef DEBUG
+	DEBUG_START("Używane zasady");
+		printf("born_size: %d\n", rules->born_size);
+		for( int i= 0; i < rules->born_size; i++ )
+			printf("| %d |", rules->born[i]);
+		printf("\n");
+		printf("lives_size: %d\n", rules->lives_size);
+		for( int i= 0; i < rules->lives_size; i++ )
+			printf("| %d |", rules->lives[i]);
+		printf("\n");
+	DEBUG_END;
+	#endif	
 
 
 	// Tablica od zera; zawsze eksportujemy pierwszą i ostatnią generację
@@ -112,7 +116,7 @@ int main( int argc, const char **argv )
 
 	#ifdef DEBUG
 	DEBUG_START("Indeksy generacji do wyeksportowania");
-	printf("gen_num: %d\nphoto_num: %d\nleap: %d\n", gen_num, photo_num, leap );
+		printf("gen_num: %d\nphoto_num: %d\nleap: %d\n", gen_num, photo_num, leap );
 	#endif
 
 	for( int i= 0; i < gen_num; i++ )
@@ -129,7 +133,7 @@ int main( int argc, const char **argv )
 	}
 
 	#ifdef DEBUG
-	printf("\n");
+		printf("\n");
 	DEBUG_END;
 	#endif
 

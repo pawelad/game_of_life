@@ -4,6 +4,6 @@
 #include "netting.h"
 
 // Zapis siatki do pliku
-void net_to_png( net_t net, int n, char *dir, char *photo_dir );
+void net_to_png( net_t *net, int n, char *dir, char *photo_dir );
 
 #endif
