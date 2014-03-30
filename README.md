@@ -6,7 +6,7 @@ It's a rather simple C implementation of Conway's [Game of Life](http://en.wikip
 **NOT USABLE YET**
 
 ## Usage
-'''C
+```C
 
 life_sym [options]
     -h, --help                        show this help message and exit
@@ -19,4 +19,4 @@ life_sym [options]
     -m, --mod_file=<str>              path to rules modification file
     -M, --mod_input=<str>             rules modification
 
-'''
+```
