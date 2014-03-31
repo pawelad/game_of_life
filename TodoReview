@@ -1,0 +1,19 @@
++ -------------------------------------------------------- +
+| TodoReview @ Monday 03/31/14 at 09:03PM                  |
+| 16 files scanned                                         |
++ -------------------------------------------------------- +
+
+## NOTE (8)
+1. netting.c:61 Do osobnej funkcji?
+2. netting.c:74 Do oddzielniej funkcji?
+3. netting.c:80 Do oddzielnej funkcji?
+4. netting.c:98 Do osobnej funkcji?
+5. rules.c:102 Do oddzielniej funkcji?
+6. rules.c:108 Do oddzielnej funkcji?
+7. main.c:18 Czy na pewno tak?
+8. main.c:149 Czy do funkcji?
+
+## TODO (3)
+1. gen_sym.c:3 Funkcja sym_gen
+2. gen_sym.c:9 funkcja cell_neighborhood
+3. png.c:3 Funckja net_to_png

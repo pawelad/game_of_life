@@ -49,5 +49,6 @@ $(BUILD)argparse.o: $(LIB)argparse.c $(LIB)argparse.h
 clean: 
 		-rm -f $(BUILD)*
 		-rm -f $(BIN)*
+		-rm -f -r results/
 		@echo "\nall cleaned"
 		

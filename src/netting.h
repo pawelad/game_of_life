@@ -3,9 +3,10 @@
 
 // Struktura przechowująca siatkę
 typedef struct {
-	int rows;
-	int cols;
-	int *vec;
+	int rows;     // Liczba rzędów
+	int cols;     // Liczba kolumn
+	int vec_size; // Ilość elementów w vec
+	int *vec;     // Wektor numerów komórek żywych
 } net_t;
 
 // Odczyt siatki z pliku
