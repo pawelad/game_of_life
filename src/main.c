@@ -15,7 +15,7 @@
 #define DEBUG_START(X) printf("\n%sDEBUG: %s %s\n",COLOR_RED,X,COLOR_RESET)
 #define DEBUG_END printf("%sDEBUG_END %s\n",COLOR_RED,COLOR_RESET)
 
-// NOTE: Czy na pewno tak?
+// NOTE: Czy na pewno zmienne globalne?
 // Deklaracja globalnych zmiennych
 char *input       = NULL;
 char *output      = NULL;
@@ -28,6 +28,7 @@ char *mod_input   = NULL;
 
 static const char *const usage[] = { "life_sym [options]", NULL, };
 
+// NOTE: Czy jest sens parsowanie do osobnej funkcji?
 void parse_arg( int argc, const char **argv );
 
 int main( int argc, const char **argv )
@@ -146,7 +147,7 @@ int main( int argc, const char **argv )
 	DEBUG_END;
 	#endif
 
-	// NOTE: Czy do funkcji?
+	// NOTE: path_to_filename() ?
 	char *ssc;
 	int l = 0;
 	ssc = strstr(input, "/");
@@ -180,6 +181,7 @@ int main( int argc, const char **argv )
 		{
 			net_to_png( net, current_photo, results_dir, photo_dir );
 			current_photo++;
+
 			#ifdef DEBUG
 				printf( "| %d |", i );
 			#endif

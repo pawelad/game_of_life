@@ -32,13 +32,14 @@ rules_t *file_to_rules( char *filename )
 
 	char line[25];
 	fgets( line, 25, f );
-	fclose(f);
-
 	r = string_to_rules( line );
+
+	fclose( f );
 
 	return r;
 }
 
+// FIXME: Co gdy cyfry się powtarzają i jest ich więcej niż 9 ?
 rules_t *string_to_rules( char *string )
 {
 	rules_t *r = malloc( sizeof(rules_t) );
@@ -49,14 +50,14 @@ rules_t *string_to_rules( char *string )
 	}
 
 	int i = 0;
-	if( !isdigit(string[i]) )
-	{
-		fprintf( stderr, "Nie można zaalokować pamięci.\n" );
-		exit( EXIT_FAILURE );
-	}
 	while( string[i] != '/' )
 	{
-		assert( isdigit(string[i]) );
+		if( !isdigit(string[i]) )
+		{
+			fprintf( stderr, "Nie poprawny format pliku z zasadami.\n" );
+			exit( EXIT_FAILURE );
+		}
+
 		r->born[i] = char_to_digit( string[i] );
 		i++;
 	}
@@ -64,14 +65,19 @@ rules_t *string_to_rules( char *string )
 	i++;
 
 	int j = 0;
-	assert( isdigit(string[i]) );
 	while( string[i] != '\0' )
 	{
-		assert( isdigit(string[i]) );
+		if( !isdigit(string[i]) )
+		{
+			fprintf( stderr, "Nie poprawny format pliku z zasadami.\n" );
+			exit( EXIT_FAILURE );
+		}
+
 		r->lives[j] = char_to_digit( string[i] );
 		i++;
 		j++;
 	}
+
 	r->lives_size = j;
 
 	return r;
@@ -99,13 +105,13 @@ void rules_to_file( rules_t *rules, char *filename, char *dir )
 {
 	assert( rules );
 
-	// NOTE: Do oddzielniej funkcji?
+	// NOTE: check_dir() ?
 	// Sprawdzenie czy istnieje i ewentualne stworzenie katalogu
 	struct stat st = { 0 };
 	if ( stat( dir, &st ) == -1 )
 		mkdir( dir, 0700 );
 
-	// NOTE: Do oddzielnej funkcji?
+	// NOTE: make_path() ?
 	char path[strlen(filename) + strlen(dir) + 2];
 	strcpy( path, dir );
 	strcat( path, "/" );

@@ -1,17 +1,20 @@
 + -------------------------------------------------------- +
-| TodoReview @ Monday 03/31/14 at 09:03PM                  |
-| 16 files scanned                                         |
+| TodoReview @ Monday 03/31/14 at 11:47PM                  |
+| 19 files scanned                                         |
 + -------------------------------------------------------- +
 
-## NOTE (8)
-1. netting.c:61 Do osobnej funkcji?
-2. netting.c:74 Do oddzielniej funkcji?
-3. netting.c:80 Do oddzielnej funkcji?
-4. netting.c:98 Do osobnej funkcji?
-5. rules.c:102 Do oddzielniej funkcji?
-6. rules.c:108 Do oddzielnej funkcji?
-7. main.c:18 Czy na pewno tak?
-8. main.c:149 Czy do funkcji?
+## FIXME (2)
+1. netting.c:13 Bez duplikatów i sortowanie
+2. rules.c:42 Co gdy cyfry się powtarzają i jest ich więcej niż 9 ?
+
+## NOTE (7)
+1. netting.c:72 check_dir() ?
+2. netting.c:78 make_path() ?
+3. rules.c:108 check_dir() ?
+4. rules.c:114 make_path() ?
+5. main.c:18 Czy na pewno zmienne globalne?
+6. main.c:31 Czy jest sens parsowanie do osobnej funkcji?
+7. main.c:150 path_to_filename() ?
 
 ## TODO (3)
 1. gen_sym.c:3 Funkcja sym_gen
