@@ -1,46 +1,36 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-#include <ctype.h>
-#include <string.h>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
 
 #include "netting.h"
+#include "misc.h"
 
-// FIXME: Bez duplikatów i sortowanie
-net_t *file_to_net( char *filename )
+// TODO: Do poprawienia
+net_t *file_to_net( net_t *n, char *filename )
 {
-	net_t *n = malloc( sizeof(*n) );
-	if( n == NULL )
-	{
-		fprintf( stderr, "Nie można zaalokować pamięci.\n" );
-		exit( EXIT_FAILURE );
-	}
+	assert( n != NULL );
 
 	// Alokacja pamięci dla wektora
 	int el_num = 64;
-	n->vec = malloc( el_num * sizeof(n->vec) );
+	n->vec = malloc( el_num * sizeof(int) );
 	if( n->vec == NULL )
 	{
 		fprintf( stderr, "Nie można zaalokować pamięci.\n" );
-		exit( EXIT_FAILURE );
+		exit(EXIT_FAILURE);
 	}
 
 	// Odczyt z pliku
 	FILE *f = fopen( filename, "r" );
 	if( f == NULL )
 	{
-		fprintf( stderr, "Nie można otworzyć pliku.\n" );
-		exit( EXIT_FAILURE );
+		fprintf( stderr, "Nie można otworzyć pliku: %s\n", filename );
+		exit(EXIT_FAILURE);
 	}
 
 	if( fscanf( f, "%d %d", &(n->rows), &(n->cols) ) != 2 )
 	{
-		fprintf( stderr, "\n" );
-		exit( EXIT_FAILURE );
+		fprintf( stderr, "Zły format pliku z siatką.\n" );
+		exit(EXIT_FAILURE);
 	}
 
 	int x, y;
@@ -50,11 +40,11 @@ net_t *file_to_net( char *filename )
 		// W razie potrzeby zwiększenie rozmiaru wektora
 		if( i == el_num )
 		{
-			n->vec = realloc( n->vec, 2 * el_num * sizeof(n->vec) );
+			n->vec = realloc( n->vec, 2 * el_num * sizeof(int) );
 			if( n->vec == NULL )
 			{
 				fprintf( stderr, "Nie można zaalokować pamięci.\n" );
-				exit( EXIT_FAILURE );
+				exit(EXIT_FAILURE);
 			}
 			el_num = 2 * el_num;
 		}
@@ -64,43 +54,40 @@ net_t *file_to_net( char *filename )
 	}
 	n->vec_size = i;
 
+	fclose(f);
+
 	return n;
 }
 
+// TODO: Do poprawienia
 void net_to_file( net_t *net, char *filename, char *dir )
 {
-	// NOTE: check_dir() ?
-	// Sprawdzenie czy istnieje i ewentualne stworzenie katalogu
-	struct stat st = { 0 };
-	if ( stat( dir, &st ) == -1 )
-		mkdir( dir, 0700 );
+	assert( net != NULL );
 
-	// NOTE: make_path() ?
-	char path[strlen(filename) + strlen(dir) + 2];
-	strcpy( path, dir );
-	strcat( path, "/" );
-	strcat( path, filename );
+	make_dir( dir );
+	char *path = create_path( filename, dir );
 
 	// Zapis do pliku
 	FILE *f = fopen( path, "w" );
 	if( f == NULL )
 	{
-		fprintf( stderr, "Nie można zapisać do pliku.\n" );
-		exit( EXIT_FAILURE );
+		fprintf( stderr, "Nie można zapisać do pliku: %s\n", path );
+		exit(EXIT_FAILURE);
 	}
+	free(path);
 
 	fprintf( f, "%d %d\n", net->rows, net->cols );
 
 	for( int i= 0; i < net->vec_size; i++ )
 	{
-		
 		int x, y;
 		xy_to_x_and_y( &x, &y, net->vec[i], net );
 		fprintf( f, "%d %d\n", x, y );
 	}
-	fclose( f ); 
+	fclose(f); 
 }
 
+// NOTE: Do wyrzucenia?
 int x_and_y_to_xy( int x, int y, net_t *net )
 {
 	// Zakładamy że w pliku siatka zaczyna się od punktu (1,1), a tablica od (0,0)
@@ -109,6 +96,7 @@ int x_and_y_to_xy( int x, int y, net_t *net )
 	return xy;
 }
 
+// NOTE: Do wyrzucenia?
 void xy_to_x_and_y( int *x, int *y, int xy, net_t *net )
 {
 	// Zakładamy że w pliku siatka zaczyna się od punktu (1,1), a tablica od (0,0)

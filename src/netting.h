@@ -1,6 +1,7 @@
 #ifndef NETTING_H
 #define NETTING_H
 
+// TODO: Do poprawienia
 // Struktura przechowująca siatkę
 typedef struct {
 	int rows;     // Liczba rzędów
@@ -10,7 +11,7 @@ typedef struct {
 } net_t;
 
 // Odczyt siatki z pliku
-net_t *file_to_net( char *filename );
+net_t *file_to_net( net_t *n, char *filename );
 
 // Zapis siatki do pliku
 void net_to_file( net_t *net, char *filename, char *dir );

@@ -14,7 +14,7 @@ LIBS = -lm
 # CFLAGS = -Wall -Wextra -Werror -std=gnu99 -pedantic -Wno-missing-field-initializers
 DEBUG ?= 0
 ifeq ($(DEBUG), 1)
-    CFLAGS = -Wall -std=gnu99 -DDEBUG
+    CFLAGS = -Wall -std=gnu99 -DDEBUG -g
     PROJECT = life_sym_debug
 else
     CFLAGS = -Wall -std=gnu99
@@ -24,11 +24,14 @@ endif
 
 all: $(PROJECT)
 
-$(PROJECT): $(BUILD)main.o $(BUILD)gen_sym.o $(BUILD)netting.o $(BUILD)png.o $(BUILD)rules.o $(BUILD)argparse.o
+$(PROJECT): $(BUILD)main.o $(BUILD)misc.o $(BUILD)gen_sym.o $(BUILD)netting.o $(BUILD)png.o $(BUILD)rules.o $(BUILD)argparse.o
 		$(CC) $(CFLAGS) $^ -o $(BIN)$(PROJECT) $(LIBS)
 		@echo "\nmake completed successfully"
 
 $(BUILD)main.o: $(SRC)main.c
+		$(CC) $(CFLAGS) $< -c -o $@ 
+
+$(BUILD)misc.o: $(SRC)misc.c $(SRC)misc.h
 		$(CC) $(CFLAGS) $< -c -o $@ 
 
 $(BUILD)gen_sym.o: $(SRC)gen_sym.c $(SRC)gen_sym.h

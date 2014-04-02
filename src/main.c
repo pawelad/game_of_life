@@ -6,38 +6,42 @@
 #include "../lib/argparse.h"
 #include "gen_sym.h"
 #include "netting.h"
-#include "png.h"
 #include "rules.h"
-
-// NOTES: Do osobnego pliku
-#define COLOR_RED "\x1b[31m"
-#define COLOR_RESET "\x1b[0m"
-#define DEBUG_START(X) printf("\n%sDEBUG: %s %s\n",COLOR_RED,X,COLOR_RESET)
-#define DEBUG_END printf("%sDEBUG_END %s\n",COLOR_RED,COLOR_RESET)
-
-// NOTE: Czy na pewno zmienne globalne?
-// Deklaracja globalnych zmiennych
-char *input       = NULL;
-char *output      = NULL;
-int gen_num       = 0;
-int photo_num     = 0;
-char *results_dir = NULL;
-char *photo_dir   = NULL;
-char *mod_file    = NULL;
-char *mod_input   = NULL;
+#include "png.h"
+#include "misc.h"
 
 static const char *const usage[] = { "life_sym [options]", NULL, };
 
-// NOTE: Czy jest sens parsowanie do osobnej funkcji?
-void parse_arg( int argc, const char **argv );
-
 int main( int argc, const char **argv )
 {
-	
-	parse_arg( argc, argv );
+	// Wywołane opcje
+	char *input       = NULL;
+	char *output      = NULL;
+	int gen_num       = 0;
+	int photo_num     = 0;
+	char *results_dir = NULL;
+	char *photo_dir   = NULL;
+	char *mod_file    = NULL;
+	char *mod_input   = NULL;
+
+	struct argparse_option options[] = {
+		OPT_HELP(),
+		OPT_STRING('i', "input", &input, "path to input file", NULL),
+		OPT_STRING('o', "output", &output, "path to output file", NULL),
+		OPT_INTEGER('n', "generation_number", &gen_num, "number of generations to simulate", NULL),
+		OPT_INTEGER('p', "photos_number", &photo_num, "number of photos to generate", NULL),
+		OPT_STRING('d', "dir", &results_dir, "directory for results", NULL),
+		OPT_STRING('D', "photo_dir", &photo_dir, "subdirectory for photos", NULL),
+		OPT_STRING('m', "mod_file", &mod_file, "path to rules modification file", NULL),
+		OPT_STRING('M', "mod_input", &mod_input, "rules modification", NULL),
+		OPT_END(),
+	};
+	struct argparse argparse;
+	argparse_init(&argparse, options, usage, 0);
+	argc = argparse_parse(&argparse, argc, argv);
 
 	#ifdef DEBUG
-	DEBUG_START("Wprowadzone opcje i argumenty");
+	DEBUG_START("Wprowadzone argumenty");
 		if( argc != 0 )
 		{
 			printf( "argc: %d\n", argc );
@@ -65,7 +69,7 @@ int main( int argc, const char **argv )
 	// Domyślne nazwy folderów
 	if( !results_dir )
 	{
-		results_dir = malloc( 8 * sizeof(&results_dir) );
+		results_dir = malloc( 8 * sizeof(char) );
 		if( results_dir == NULL )
 		{
 			fprintf( stderr, "Nie można zaalokować pamięci.\n" );
@@ -76,7 +80,7 @@ int main( int argc, const char **argv )
 
 	if( !photo_dir )
 	{
-		photo_dir = malloc( 4 * sizeof(&results_dir) );
+		photo_dir = malloc( 4 * sizeof(char) );
 		if( results_dir == NULL )
 		{
 			fprintf( stderr, "Nie można zaalokować pamięci.\n" );
@@ -87,7 +91,13 @@ int main( int argc, const char **argv )
 
 
 	// Zasady
-	rules_t *rules;
+	rules_t *rules = malloc( sizeof(rules_t) );
+	if( rules == NULL )
+	{
+		fprintf( stderr, "Nie można zaalokować pamięci.\n" );
+		exit(EXIT_FAILURE);
+	}
+
 	if( mod_file && mod_input )
 	{
 		fprintf( stderr, "Wywołałeś program jednocześnie ze ścieżką do pliku z zasadami oraz z zasadami.\n" );
@@ -96,7 +106,7 @@ int main( int argc, const char **argv )
 	}
 	else if( mod_file )
 	{
-		rules = file_to_rules( mod_file );
+		rules = file_to_rules( rules, mod_file );
 		rules_to_file( rules, "rules", results_dir );
 
 		#ifdef DEBUG
@@ -107,7 +117,7 @@ int main( int argc, const char **argv )
 	}
 	else if( mod_input )
 	{
-		rules = string_to_rules( mod_input );
+		rules = string_to_rules( rules, mod_input );
 		rules_to_file( rules, "rules", results_dir );
 
 		#ifdef DEBUG
@@ -117,7 +127,7 @@ int main( int argc, const char **argv )
 		#endif
 	}
 	else
-		rules = default_rules();
+		rules = default_rules( rules );
 
 	#ifdef DEBUG
 	DEBUG_START( "Używane zasady" );
@@ -134,7 +144,14 @@ int main( int argc, const char **argv )
 
 
 	// Siatka
-	net_t *net = file_to_net( input );
+	net_t *net = malloc( sizeof(net_t) );
+	if( net == NULL )
+	{
+		fprintf( stderr, "Nie można zaalokować pamięci.\n" );
+		exit(EXIT_FAILURE);
+	}
+
+	net = file_to_net( net, input );
 
 	#ifdef DEBUG
 	DEBUG_START( "Wprowadzona siatka" );
@@ -147,21 +164,12 @@ int main( int argc, const char **argv )
 	DEBUG_END;
 	#endif
 
-	// NOTE: path_to_filename() ?
-	char *ssc;
-	int l = 0;
-	ssc = strstr(input, "/");
-	do{
-	    l = strlen(ssc) + 1;
-	    input = &input[strlen(input)-l+2];
-	    ssc = strstr(input, "/");
-	}while(ssc);
-
-	net_to_file( net, input, results_dir );
+	char *basename = filename_from_path( input );
+	net_to_file( net, basename, results_dir );
 
 	#ifdef DEBUG
 	DEBUG_START( "Siatka zapisana do pliku" );
-		printf("filename: %s/%s\n", results_dir, input );
+		printf("filename: %s/%s\n", results_dir, basename );
 	DEBUG_END;
 	#endif
 
@@ -204,27 +212,16 @@ int main( int argc, const char **argv )
 	DEBUG_END;
 	#endif
 
+
+	free(results_dir);
+	free(photo_dir);
+	free(rules);
+	free(net->vec);
+	free(net);
+
+
 	printf( "\nSymulacja przeprowadzona poprawnie.\n" );
 
 	printf( "\n" );
 	return EXIT_SUCCESS;
-}
-
-void parse_arg( int argc, const char **argv )
-{
-	struct argparse_option options[] = {
-		OPT_HELP(),
-		OPT_STRING('i', "input", &input, "path to input file", NULL),
-		OPT_STRING('o', "output", &output, "path to output file", NULL),
-		OPT_INTEGER('n', "generation_number", &gen_num, "number of generations to simulate", NULL),
-		OPT_INTEGER('p', "photos_number", &photo_num, "number of photos to generate", NULL),
-		OPT_STRING('d', "dir", &results_dir, "directory for results", NULL),
-		OPT_STRING('D', "photo_dir", &photo_dir, "subdirectory for photos", NULL),
-		OPT_STRING('m', "mod_file", &mod_file, "path to rules modification file", NULL),
-		OPT_STRING('M', "mod_input", &mod_input, "rules modification", NULL),
-		OPT_END(),
-	};
-	struct argparse argparse;
-	argparse_init(&argparse, options, usage, 0);
-	argc = argparse_parse(&argparse, argc, argv);
 }
