@@ -3,10 +3,17 @@ Game of Life
 
 It's a C implementation of Conway's [Game of Life](http://en.wikipedia.org/wiki/Conway's_Game_of_Life) simulator made for my university assigment.
 
+You can:
+
+- read first generation from file
+- simulate it given number of times
+- generate given number of `PNG` files
+- modify rules of the game either by file or directly from terminal
+
 ##Instalation
 The program is meant to run on Linux.
 
-Makefile is included, so you can compile it simply by typing `make` which creates an executable `bin/life_sym` file.
+Makefile is included, so you can compile it simply by typing `make` in termial, which creates an executable `bin/life_sym` file.
 
 You can also compile it with debug flag `make DEBUG=1 -B` which creates `bin/life_sym_debug` with additional output messages.
 
@@ -55,10 +62,11 @@ So the standard rules in that format are `23/3`.
 - [argparse](https://github.com/Cofyc/argparse) --- parsing arguments (included)
 
 ##To do
+- notification when given result directory exist
 - more thorough testing
 - consider better memory managment with storing net (CRS?)
 - better makefile ?
 
 ##Suggestions
-It's my first 'proper' programming project, so if you have any suggestion about anything (directory tree, modules, functions, code clarity, comments placement, README file etc.) then let me know.
+It's my first 'proper' programming project, so if you have any suggestion about anything (directory tree, modules, functions, code clarity, comments placement, README file, etc.) then let me know.
 Thanks!
