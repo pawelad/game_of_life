@@ -1,37 +1,37 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-#include <ctype.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "rules.h"
 #include "misc.h"
 
-// Zamiana char na int
 #define char_to_digit(c) (c-'0')
 
 rules_t *file_to_rules( rules_t *r, char *filename )
 {
 	assert( r != NULL );
 
-	// Odczyt z pliku
 	FILE *f = fopen( filename, "r" );
 	if( f == NULL )
 	{
-		fprintf( stderr, "Nie można otworzyć pliku: %s\n", filename );
+		fprintf( stderr, "Can't open file: %s\n", filename );
 		exit(EXIT_FAILURE);
 	}
 
 	fseek( f, 0, SEEK_END );
-	long int length = ftell( f );
+	long int length = ftell(f);
 	fseek( f, 0, SEEK_SET );
-	char *buffer = malloc( ( length + 1 ) * sizeof(char) );
+
+	char *buffer = malloc( length + 1 );
 	if( buffer == NULL )
 	{
-		fprintf( stderr, "Nie można zaalokować pamięci.\n" );
+		fprintf( stderr, "Can't allocate memory.\n" );
 		exit(EXIT_FAILURE);
 	}
 	memset( buffer, '\0', length + 1 );
+
 	fread( buffer, 1, length, f );
 
 	r = string_to_rules( r, buffer );
@@ -49,17 +49,16 @@ rules_t *string_to_rules( rules_t *r, char *string )
 
 	if( strlen(string) > 21 )
 	{
-		fprintf( stderr, "Plik z zasadami ma za dużo znaków.\n" );
+		fprintf( stderr, "Rules file has got to many characters.\n" );
 		exit(EXIT_FAILURE);
 	}
 
 	int i = 0;
 	while( string[i] != '/' )
 	{
-		printf("%c\n", string[i]);
 		if( !isdigit(string[i]) || i > 9 )
 		{
-			fprintf( stderr, "Nie poprawny format pliku z zasadami.\n" );
+			fprintf( stderr, "Incorrect rules file.\n" );
 			exit(EXIT_FAILURE);
 		}
 
@@ -72,10 +71,9 @@ rules_t *string_to_rules( rules_t *r, char *string )
 	int j = 0;
 	while( string[i] != '\0' )
 	{
-		printf("%c\n", string[i]);
 		if( !isdigit(string[i]) || j > 9 )
 		{
-			fprintf( stderr, "Nie poprawny format pliku z zasadami.\n" );
+			fprintf( stderr, "Incorrect rules file.\n" );
 			exit(EXIT_FAILURE);
 		}
 
@@ -99,29 +97,31 @@ rules_t *default_rules( rules_t *r )
 	return r;
 }
 
-void rules_to_file( rules_t *rules, char *filename, char *dir )
+void rules_to_file( rules_t *r, char *filename, char *dir )
 {
-	assert( rules != NULL );
+	assert( r != NULL );
 
-	make_dir( dir );
-	char *path = create_path( filename, dir );
+	int k = strlen(dir) +
+			strlen("/") +
+			strlen(filename) + 1;
+	char *path = malloc( k );
+	snprintf( path, k, "%s/%s", dir, filename );
 
-	// Zapis do pliku
 	FILE *f = fopen( path, "w" );
 	if( f == NULL )
 	{
-		fprintf( stderr, "Nie można zapisać do pliku: %s\n", path );
+		fprintf( stderr, "Can't write to file: %s\n", path );
 		exit(EXIT_FAILURE);
 	}
 	free(path);
 
-	for( int i= 0; i < rules->born_size; i++ )
-		fprintf( f, "%d", rules->born[i] );
+	for( int i = 0; i < r->born_size; i++ )
+		fprintf( f, "%d", r->born[i] );
 
 	fputc ( '/', f );
 
-	for( int i= 0; i < rules->lives_size; i++ )
-		fprintf( f, "%d", rules->lives[i] );
+	for( int i = 0; i < r->lives_size; i++ )
+		fprintf( f, "%d", r->lives[i] );
 
 	fclose(f);
 }

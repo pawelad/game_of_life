@@ -4,10 +4,13 @@
 #include "netting.h"
 #include "rules.h"
 
-// Symulacja generacji
-net_t *sym_gen( net_t *net, rules_t *rules );
+// Generation symulation
+net_t *sym_gen( net_t *n, rules_t *r );
 
-// Ustalanie sąsiedztwa dla komórki o danym numerze
-int cell_neighborhood( net_t *net, int xy );
+// Next state - alive, dead - of the cell based on rules 
+int next_state( net_t *n, int cell_num, rules_t *r );
+
+// Number of cells alive neighbours
+int cell_neighborhood( net_t *n, int cell_num );
 
 #endif

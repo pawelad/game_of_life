@@ -8,23 +8,22 @@ LIB= lib/
 BUILD= build/
 BIN= bin/
 # Necessary libraries
-LIBS = -lm
+LIBS = -lm -lpng
 
 # Compiler flags based on debug mode
-# CFLAGS = -Wall -Wextra -Werror -std=gnu99 -pedantic -Wno-missing-field-initializers
 DEBUG ?= 0
 ifeq ($(DEBUG), 1)
-    CFLAGS = -Wall -std=gnu99 -DDEBUG -g
+    CFLAGS = -Wall -Wextra -Werror -std=gnu99 -pedantic -Wno-missing-field-initializers -DDEBUG -g
     PROJECT = life_sym_debug
 else
-    CFLAGS = -Wall -std=gnu99
+    CFLAGS = -Wall -Wextra -Werror -std=gnu99 -pedantic -Wno-missing-field-initializers
 endif
 
-.PHONY: all clean
+.PHONY: all clean directories
 
-all: $(PROJECT)
+all: directories $(PROJECT)
 
-$(PROJECT): $(BUILD)main.o $(BUILD)misc.o $(BUILD)gen_sym.o $(BUILD)netting.o $(BUILD)png.o $(BUILD)rules.o $(BUILD)argparse.o
+$(PROJECT): $(BUILD)main.o $(BUILD)misc.o $(BUILD)gen_sym.o $(BUILD)netting.o $(BUILD)to_png.o $(BUILD)rules.o $(BUILD)argparse.o
 		$(CC) $(CFLAGS) $^ -o $(BIN)$(PROJECT) $(LIBS)
 		@echo "\nmake completed successfully"
 
@@ -40,7 +39,7 @@ $(BUILD)gen_sym.o: $(SRC)gen_sym.c $(SRC)gen_sym.h
 $(BUILD)netting.o: $(SRC)netting.c $(SRC)netting.h
 		$(CC) $(CFLAGS) $< -c -o $@ 
 
-$(BUILD)png.o: $(SRC)png.c $(SRC)png.h
+$(BUILD)to_png.o: $(SRC)to_png.c $(SRC)to_png.h
 		$(CC) $(CFLAGS) $< -c -o $@ 
 
 $(BUILD)rules.o: $(SRC)rules.c $(SRC)rules.h
@@ -49,9 +48,12 @@ $(BUILD)rules.o: $(SRC)rules.c $(SRC)rules.h
 $(BUILD)argparse.o: $(LIB)argparse.c $(LIB)argparse.h
 		$(CC) $(CFLAGS) $< -c -o $@ 
 
+directories: 
+		mkdir -p bin
+		mkdir -p build
+
 clean: 
 		-rm -f $(BUILD)*
 		-rm -f $(BIN)*
-		-rm -f -r results/
 		@echo "\nall cleaned"
 		

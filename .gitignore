@@ -1,7 +1,6 @@
 *.o
 *.aut
 
-
 build/
 bin/
-test/
+results/
