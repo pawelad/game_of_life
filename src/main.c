@@ -246,6 +246,8 @@ int main( int argc, const char **argv )
 	DEBUG_END;
 	#endif
 
+	printf( "All files are saved in %s\n", results_dir );
+
 
 	free(results_dir);
 	free(photo_dir);
@@ -257,7 +259,6 @@ int main( int argc, const char **argv )
 
 
 	printf( "\nSymulation completed properly.\n" );
-	printf( "All files are saved in %s\n", results_dir );
 
 	printf("\n");
 	return EXIT_SUCCESS;
