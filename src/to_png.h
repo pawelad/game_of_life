@@ -22,8 +22,8 @@ typedef struct  {
 // Returns pointer to pixel with given coordinates
 pixel_t *pixel_at( bitmap_t *bitmap, int x, int y );
 
-// Saving net to PNG file
-void net_to_png( net_t *n, char *file_path );
+// Saving net to PNG file in given scale
+void net_to_png( net_t *n, char *file_path, int scale );
 
 // Saving picture struct to PNG file
 int save_png_to_file( bitmap_t *bitmap, char *path );

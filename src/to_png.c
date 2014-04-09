@@ -12,52 +12,40 @@ pixel_t *pixel_at( bitmap_t *bitmap, int x, int y )
 	return bitmap->pixels + bitmap->width * y + x;
 }
 
-void net_to_png( net_t *n, char *file_path )
+void net_to_png( net_t *n, char *file_path, int scale )
 {
 	assert( n != NULL );
 
 	bitmap_t pic;
 
-	pic.width = n->cols * 2;
-	pic.height = n->rows * 2;
+	pic.width = n->cols * scale;
+	pic.height = n->rows * scale;
 
 	pic.pixels = calloc( sizeof(pixel_t), pic.width * pic.height );
 
 	int i;
-	unsigned int y;
-	unsigned int x;
 	int x1;
 	int y1 = 0;
 	pixel_t *pixel;
 
-	// One 'dot' is 2 pixel x 2 pixel
-	for( y = 0; y < pic.height; y+=2 )
+	for( unsigned int y = 0; y < pic.height; y+= scale )
 	{
 		x1 = 0;
-		for( x = 0; x < pic.width; x+=2 )
+		for( unsigned int x = 0; x < pic.width; x+= scale )
 		{
 			i = ( n->cols * y1 + x1 );
-			if( n->vec[i] != 1 )
+			if( n->vec[i] == 1 )
 			{
-				pixel = pixel_at( &pic, x, y );
-				pixel->red = 255;
-				pixel->green = 255;
-				pixel->blue = 255;
-
-				pixel = pixel_at( &pic, x + 1, y );
-				pixel->red = 255;
-				pixel->green = 255;
-				pixel->blue = 255;
-
-				pixel = pixel_at( &pic, x, y + 1 );
-				pixel->red = 255;
-				pixel->green = 255;
-				pixel->blue = 255;
-
-				pixel = pixel_at( &pic, x + 1, y + 1 );
-				pixel->red = 255;
-				pixel->green = 255;
-				pixel->blue = 255;
+				for( int a = 0; a < scale; a++ )
+				{
+					for( int b = 0; b < scale; b++ )
+					{
+						pixel = pixel_at( &pic, x + a, y + b );
+						pixel->red = 255;
+						pixel->green = 255;
+						pixel->blue = 255;
+					}
+				}
 			}
 			x1++;
 		}

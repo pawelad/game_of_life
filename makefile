@@ -53,7 +53,7 @@ directories:
 		mkdir -p build
 
 clean: 
-		-rm -f $(BUILD)*
-		-rm -f $(BIN)*
+		-rm -f -r $(BUILD)
+		-rm -f -r $(BIN)
 		@echo "\nall cleaned"
 		
