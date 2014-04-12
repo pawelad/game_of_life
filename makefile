@@ -21,10 +21,10 @@ endif
 
 .PHONY: all clean directories
 
-all: directories $(PROJECT)
+all: directories $(BIN)$(PROJECT)
 
-$(PROJECT): $(BUILD)main.o $(BUILD)misc.o $(BUILD)gen_sym.o $(BUILD)netting.o $(BUILD)to_png.o $(BUILD)rules.o $(BUILD)argparse.o
-		$(CC) $(CFLAGS) $^ -o $(BIN)$(PROJECT) $(LIBS)
+$(BIN)$(PROJECT): $(BUILD)main.o $(BUILD)misc.o $(BUILD)gen_sym.o $(BUILD)netting.o $(BUILD)to_png.o $(BUILD)rules.o $(BUILD)argparse.o
+		$(CC) $(CFLAGS) $^ -o $@ $(LIBS)
 		@echo "\nmake completed successfully"
 
 $(BUILD)main.o: $(SRC)main.c
@@ -49,11 +49,11 @@ $(BUILD)argparse.o: $(LIB)argparse.c $(LIB)argparse.h
 		$(CC) $(CFLAGS) $< -c -o $@ 
 
 directories: 
-		mkdir -p bin
-		mkdir -p build
+		@mkdir -p bin
+		@mkdir -p build
 
 clean: 
-		-rm -f -r $(BUILD)
-		-rm -f -r $(BIN)
+		@rm -f -r $(BUILD)
+		@rm -f -r $(BIN)
 		@echo "\nall cleaned"
 		

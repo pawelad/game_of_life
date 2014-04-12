@@ -1,10 +1,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include <assert.h>
 
 #include "netting.h"
 #include "misc.h"
+
+#define MAXL 1024
+#define RANDOM_NET_SIZE 100
 
 net_t *file_to_net( net_t *n, char *filename )
 {
@@ -12,30 +16,28 @@ net_t *file_to_net( net_t *n, char *filename )
 
 	FILE *f = fopen( filename, "r" );
 	if( f == NULL )
-	{
-		fprintf( stderr, "Can't open file: %s\n", filename );
-		exit(EXIT_FAILURE);
-	}
+		print_error_file( filename );
 
-	if( fscanf( f, "%d %d", &(n->rows), &(n->cols) ) != 2 )
-	{
-		fprintf( stderr, "Incorrect net file.\n" );
-		exit(EXIT_FAILURE);
-	}
+	char line[MAXL];
+	fgets( line, MAXL, f );
+
+	if( sscanf( line, "%d %d", &(n->rows), &(n->cols) ) != 2 )
+			print_error("net");
 
 	n->vec = calloc( n->rows * n->cols, sizeof(unsigned char) );
 	if( n->vec == NULL )
-	{
-		fprintf( stderr, "Can't allocate memory.\n" );
-		exit(EXIT_FAILURE);
-	}
+		print_error("alloc");
 
 	int i, x, y;
-	while( fscanf( f, "%d %d", &x, &y ) == 2 )
+	while( fgets( line, MAXL, f ) != NULL )
 	{
+		// NOTE: What about '4 3abc' ? 'strtok'?
+		if( sscanf( line, "%d %d", &x, &y ) != 2 )
+			print_error("net");
+
 		if( x > n->rows || y > n->cols )
 		{
-			fprintf( stderr, "Coordinates in net file are bigger then net dimensions.\n" );
+			fprintf( stderr, "%sERROR:%s Coordinates of living cell in net file is bigger then net dimensions.\n", COLOR_RED, COLOR_RESET );
 			exit(EXIT_FAILURE);
 		}
 
@@ -48,6 +50,30 @@ net_t *file_to_net( net_t *n, char *filename )
 	return n;
 }
 
+net_t *random_net( net_t *n )
+{
+	assert( n != NULL );
+	srand( time(NULL) );
+
+	n->rows = RANDOM_NET_SIZE;
+	n->cols = RANDOM_NET_SIZE;
+
+	n->vec = calloc( n->rows * n->cols, sizeof(unsigned char) );
+	if( n->vec == NULL )
+		print_error("alloc");
+
+	int r;
+	for( int i = 0; i < n->rows * n->cols; i++ )
+	{
+		// 20% chances of cell being alive
+		r = rand() % 10;
+		if( r < 2 )
+			n->vec[i] = 1;
+	}
+
+	return n;
+}
+
 void net_to_file( net_t *n, char *filename, char *dir )
 {
 	assert( n != NULL );
@@ -56,14 +82,14 @@ void net_to_file( net_t *n, char *filename, char *dir )
 			strlen("/") +
 			strlen(filename) + 1;
 	char *path = malloc( k );
+	if( path == NULL )
+		print_error("alloc");
 	snprintf( path, k, "%s/%s", dir, filename );
 
 	FILE *f = fopen( path, "w" );
 	if( f == NULL )
-	{
-		fprintf( stderr, "Can't write to file: %s\n", path );
-		exit(EXIT_FAILURE);
-	}
+		print_error_file( filename );
+
 	free(path);
 
 	fprintf( f, "%d %d\n", n->rows, n->cols );

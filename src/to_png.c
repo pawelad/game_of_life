@@ -22,12 +22,15 @@ void net_to_png( net_t *n, char *file_path, int scale )
 	pic.height = n->rows * scale;
 
 	pic.pixels = calloc( sizeof(pixel_t), pic.width * pic.height );
+	if( pic.pixels == NULL )
+		print_error("alloc");
 
 	int i;
 	int x1;
 	int y1 = 0;
 	pixel_t *pixel;
 
+	// One cell is 'scale' X 'scale' size
 	for( unsigned int y = 0; y < pic.height; y+= scale )
 	{
 		x1 = 0;
@@ -40,6 +43,7 @@ void net_to_png( net_t *n, char *file_path, int scale )
 				{
 					for( int b = 0; b < scale; b++ )
 					{
+						// White
 						pixel = pixel_at( &pic, x + a, y + b );
 						pixel->red = 255;
 						pixel->green = 255;

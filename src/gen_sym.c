@@ -3,6 +3,7 @@
 #include <assert.h>
 
 #include "gen_sym.h"
+#include "misc.h"
 
 net_t *sym_gen( net_t *n, rules_t *r )
 {
@@ -10,21 +11,15 @@ net_t *sym_gen( net_t *n, rules_t *r )
 
 	net_t *next_net = malloc( sizeof(net_t) );
 	if( next_net == NULL )
-	{
-		fprintf( stderr, "Can't allocate memory.\n" );
-		exit(EXIT_FAILURE);
-	}
+		print_error("alloc");
 
 	next_net->cols = n->cols;
 	next_net->rows = n->rows;
 
 	next_net->vec = calloc( next_net->rows * next_net->cols, sizeof(unsigned char) );
 	if( n->vec == NULL )
-	{
-		fprintf( stderr, "Can't allocate memory.\n" );
-		exit(EXIT_FAILURE);
-	}
-
+		print_error("alloc");
+	
 	for( int i = 0; i < next_net->rows * next_net->cols; i++ )
 	{	
 		next_net->vec[i] = next_state( n, i, r );

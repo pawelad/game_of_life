@@ -11,6 +11,9 @@ typedef struct {
 // Reading net from file to struct
 net_t *file_to_net( net_t *n, char *filename );
 
+// Generates random net
+net_t *random_net( net_t *n );
+
 // Writing net struct to file
 void net_to_file( net_t *n, char *filename, char *dir );
 

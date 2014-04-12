@@ -2,8 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <libgen.h> // basename
-
 #include "../lib/argparse.h"
 #include "gen_sym.h"
 #include "netting.h"
@@ -28,24 +26,24 @@ int main( int argc, const char **argv )
 
 	// Wywołane opcje
 	char *input       = NULL;
-	char *output      = NULL;
 	int gen_num       = 0;
 	int photo_num     = 0;
 	int scale         = 2;
 	char *results_dir = "results";
 	char *photo_dir   = "gfx";
+	int random        = 0;
 	char *mod_file    = NULL;
 	char *mod_input   = NULL;
 
 	struct argparse_option options[] = {
 		OPT_HELP( ),
 		OPT_STRING( 'i', "input", &input, "path to input file", NULL ),
-		OPT_STRING( 'o', "output", &output, "name of output file", NULL) ,
 		OPT_INTEGER( 'n', "generation_number", &gen_num, "number of generations to simulate", NULL ),
 		OPT_INTEGER( 'p', "photos_number", &photo_num, "number of photos to generate", NULL ),
-		OPT_INTEGER( 's', "scale", &scale, "graphic enlargement scale factor", NULL ),
-		OPT_STRING( 'd', "dir", &results_dir, "results directory", NULL ),
-		OPT_STRING( 'D', "photo_dir", &photo_dir, "photos subdirectory", NULL ),
+		OPT_INTEGER( 's', "scale", &scale, "graphic enlargement scale factor (default: 2)", NULL ),
+		OPT_STRING( 'd', "dir", &results_dir, "results directory (default: results)", NULL ),
+		OPT_STRING( 'D', "photo_dir", &photo_dir, "photos subdirectory (default: gfx)", NULL ),
+		OPT_BOOLEAN('r', "random", &random, "creates random net; overrides input file", NULL),
 		OPT_STRING( 'm', "mod_file", &mod_file, "path to rules modification file", NULL ),
 		OPT_STRING( 'M', "mod_input", &mod_input, "rules modification string", NULL ),
 		OPT_END( ),
@@ -54,13 +52,13 @@ int main( int argc, const char **argv )
 	argparse_init( &argparse, options, usage, 0 );
 	argc = argparse_parse( &argparse, argc, argv );
 
+
 	// Mandatory options
-	if( !input || !output || !gen_num || !photo_num )
+	if( ( !input && random == 0 ) || !gen_num || !photo_num )
 	{
 		fprintf( stderr, "You didin't run the program with the required options.\n" );
 		printf( "\nRequired options:\n");
 		printf( "    -i, --input=<str>                 path to input file\n" );
-		printf( "    -o, --output=<str>                name of output file\n" );
 		printf( "    -n, --generation_number=<int>     number of generations to simulate\n" );
 		printf( "    -p, --photos_number=<int>         number of photos to generate\n\n" );
 
@@ -69,8 +67,8 @@ int main( int argc, const char **argv )
 
 	if( photo_num > 99999 )
 	{
-		fprintf( stderr, "To big number of photos to generate.\n" );
-		printf("The number of photos to generate must be smaller then 10 000.\n");
+		fprintf( stderr, "%sERROR:%s To big number of photos to generate.\n", COLOR_RED, COLOR_RESET );
+		printf("The number of photos to generate must be smaller than 10 000.\n");
 		exit(EXIT_FAILURE);
 	}
 
@@ -82,10 +80,7 @@ int main( int argc, const char **argv )
 						  strlen(photo_dir) + 1;
 	char *photo_path = malloc( photo_path_size );
 	if( photo_path == NULL )
-	{
-		fprintf( stderr, "Can't allocate memory.\n" );
-		exit(EXIT_FAILURE);
-	}
+		print_error("alloc");
 	snprintf( photo_path, photo_path_size, "%s/%s", results_dir, photo_dir );
 	create_dir( photo_path );
 
@@ -93,14 +88,12 @@ int main( int argc, const char **argv )
 	// Rules
 	rules_t *rules = malloc( sizeof(rules_t) );
 	if( rules == NULL )
-	{
-		fprintf( stderr, "Can't allocate memory.\n" );
-		exit(EXIT_FAILURE);
-	}
+		print_error("alloc");
 
 	if( mod_file && mod_input )
 	{
-		fprintf( stderr, "You run the program with both modification file and input.\n" );
+		fprintf( stderr, "%sERROR:%s You ran the program with both modification file and input.\n", COLOR_RED, COLOR_RESET );
+		printf("Run the program with no more than one modification input.\n");
 		exit(EXIT_FAILURE);
 	}
 	else if( mod_file )
@@ -144,15 +137,15 @@ int main( int argc, const char **argv )
 	#endif
 
 
-	// Netting
+	// Net
 	net_t *net = malloc( sizeof(net_t) );
 	if( net == NULL )
-	{
-		fprintf( stderr, "Can't allocate memory.\n" );
-		exit(EXIT_FAILURE);
-	}
+		print_error("alloc");
 
-	net = file_to_net( net, input );
+	if( random == 1 )
+		net = random_net( net );
+	else
+		net = file_to_net( net, input );
 
 	#ifdef DEBUG
 	DEBUG_START("Net");
@@ -199,12 +192,11 @@ int main( int argc, const char **argv )
 	}
 	#endif
 
-	char *file = basename(input);
-	net_to_file( net, file, results_dir );
+	net_to_file( net, "start_net", results_dir );
 
 	#ifdef DEBUG
 	DEBUG_START("Net saved to file");
-		printf( "filename: %s/%s\n", results_dir, file );
+		printf( "filename: %s/start_net\n", results_dir );
 	DEBUG_END;
 	#endif
 
@@ -235,19 +227,18 @@ int main( int argc, const char **argv )
 	DEBUG_END;
 	#endif
 
+	// Photo filename format
 	int file_path_size = strlen("/net_") +
-						 5 + // 5 digits numbers
+						 5 +              // 5 digits numbers
 						 strlen(".png") +
 						 strlen(photo_path) + 1;
 	char *file_path = malloc( file_path_size );
 	if( file_path == NULL )
-	{
-		fprintf( stderr, "Can't allocate memory.\n" );
-		exit(EXIT_FAILURE);
-	}
-	int current_photo = 0;
+		print_error("alloc");
+
 
 	// Simulation
+	int current_photo = 0;
 	for( int i = 0; i < gen_num; i++ )
 	{
 		if( i == 0 || i % leap == 0 || i == gen_num - 1 )
@@ -260,11 +251,11 @@ int main( int argc, const char **argv )
 	}
 
 	// Final net
-	net_to_file( net, output, results_dir );
+	net_to_file( net, "end_net", results_dir );
 
 	#ifdef DEBUG
 	DEBUG_START("Net saved to file");
-		printf( "filename: %s/%s\n", results_dir, output );
+		printf( "filename: %s/end_net\n", results_dir );
 	DEBUG_END;
 	#endif
 

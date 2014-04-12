@@ -6,7 +6,7 @@ It's a `C` implementation of Conway's [Game of Life](http://en.wikipedia.org/wik
 Main features:
 - read first generation from file
 - simulate it given number of times
-- generate given number of `PNG` files
+- generate a given number of `PNG` files
 - modify rules of the game (either by file or directly from terminal)
 
 All the options are listed in the [Usage](#usage) section.
@@ -27,29 +27,29 @@ You can clean everything up (except results) with `make clean`.
 
     -h, --help                        show this help message and exit
     -i, --input=<str>                 path to input file
-    -o, --output=<str>                name of output file
     -n, --generation_number=<int>     number of generations to simulate
     -p, --photos_number=<int>         number of photos to generate
-    -s, --scale=<int>                 graphic enlargement scale factor
-    -d, --dir=<str>                   results directory
-    -D, --photo_dir=<str>             photos subdirectory
+    -s, --scale=<int>                 graphic enlargement scale factor (default: 2)
+    -d, --dir=<str>                   results directory (default: results)
+    -D, --photo_dir=<str>             photos subdirectory (default: gfx)
+    -r, --random                      creates random net; overrides input file
     -m, --mod_file=<str>              path to rules modification file
     -M, --mod_input=<str>             rules modification string   
 ```
 
-Options: `--input`, `--output`, `--generation_number` and `--photos_number` are required to run program.
+Options: `--input`, `--generation_number` and `--photos_number` are required to run program.
 
 ##File format
-Sample files are included in the `sample` directory.
+Sample input files are included in the `sample` directory.
 
 ### Netting file
-Sample input net file contains:
+Input net file contains:
 
 1. Grid dimensions (2D)
 2. Coordinates of living cells
 
 ### Rules file
-Sample rules file is made of:
+Rules file is made of:
 
 1. Numbers of living neighbors on which living cell remain alive
 2. Slash (`/`)
@@ -64,7 +64,7 @@ So the standard rules in that format are `23/3`.
 - [argparse](https://github.com/Cofyc/argparse) --- parsing arguments (included)
 
 ##To do
-- more thorough testing
+- strtok for reading net file ?
 - better makefile ?
 
 ##Suggestions
