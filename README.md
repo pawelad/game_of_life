@@ -64,8 +64,7 @@ So the standard rules in that format are `23/3`.
 - [argparse](https://github.com/Cofyc/argparse) --- parsing arguments (included)
 
 ##To do
-- strtok for reading net file ?
-- better makefile ?
+- generic makefile?
 
 ##Suggestions
 It's my first 'proper' programming project, so if you have any suggestion about anything (directory tree, modules, functions, code clarity, comments placement, README file, etc.) then let me know.

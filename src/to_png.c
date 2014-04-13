@@ -30,7 +30,7 @@ void net_to_png( net_t *n, char *file_path, int scale )
 	int y1 = 0;
 	pixel_t *pixel;
 
-	// One cell is 'scale' X 'scale' size
+	// One cell is 'scale'x'scale' size
 	for( unsigned int y = 0; y < pic.height; y+= scale )
 	{
 		x1 = 0;

@@ -24,29 +24,29 @@ endif
 all: directories $(BIN)$(PROJECT)
 
 $(BIN)$(PROJECT): $(BUILD)main.o $(BUILD)misc.o $(BUILD)gen_sym.o $(BUILD)netting.o $(BUILD)to_png.o $(BUILD)rules.o $(BUILD)argparse.o
-		$(CC) $(CFLAGS) $^ -o $@ $(LIBS)
+		@$(CC) $(CFLAGS) $^ -o $@ $(LIBS)
 		@echo "\nmake completed successfully"
 
 $(BUILD)main.o: $(SRC)main.c
-		$(CC) $(CFLAGS) $< -c -o $@ 
+		@$(CC) $(CFLAGS) $< -c -o $@ 
 
 $(BUILD)misc.o: $(SRC)misc.c $(SRC)misc.h
-		$(CC) $(CFLAGS) $< -c -o $@ 
+		@$(CC) $(CFLAGS) $< -c -o $@ 
 
 $(BUILD)gen_sym.o: $(SRC)gen_sym.c $(SRC)gen_sym.h
-		$(CC) $(CFLAGS) $< -c -o $@ 
+		@$(CC) $(CFLAGS) $< -c -o $@ 
 
 $(BUILD)netting.o: $(SRC)netting.c $(SRC)netting.h
-		$(CC) $(CFLAGS) $< -c -o $@ 
+		@$(CC) $(CFLAGS) $< -c -o $@ 
 
 $(BUILD)to_png.o: $(SRC)to_png.c $(SRC)to_png.h
-		$(CC) $(CFLAGS) $< -c -o $@ 
+		@$(CC) $(CFLAGS) $< -c -o $@ 
 
 $(BUILD)rules.o: $(SRC)rules.c $(SRC)rules.h
-		$(CC) $(CFLAGS) $< -c -o $@ 
+		@$(CC) $(CFLAGS) $< -c -o $@ 
 
 $(BUILD)argparse.o: $(LIB)argparse.c $(LIB)argparse.h
-		$(CC) $(CFLAGS) $< -c -o $@ 
+		@$(CC) $(CFLAGS) $< -c -o $@ 
 
 directories: 
 		@mkdir -p bin

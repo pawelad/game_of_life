@@ -7,7 +7,6 @@
 #include "netting.h"
 #include "misc.h"
 
-#define MAXL 1024
 #define RANDOM_NET_SIZE 100
 
 net_t *file_to_net( net_t *n, char *filename )
@@ -18,22 +17,36 @@ net_t *file_to_net( net_t *n, char *filename )
 	if( f == NULL )
 		print_error_file( filename );
 
-	char line[MAXL];
-	fgets( line, MAXL, f );
+	char line[MAX_LINE];
+	int pos;
 
-	if( sscanf( line, "%d %d", &(n->rows), &(n->cols) ) != 2 )
-			print_error("net");
+	// Checking net file format for '<int> <int>\n'
+	fgets( line, MAX_LINE, f );
+	if( sscanf( line, "%d %d %n", &(n->rows), &(n->cols), &pos ) != 2 )
+	{
+		print_error("net");
+	}
+	else if( line[pos] != '\0' )
+	{
+		print_error("net");
+	}
 
 	n->vec = calloc( n->rows * n->cols, sizeof(unsigned char) );
 	if( n->vec == NULL )
 		print_error("alloc");
 
 	int i, x, y;
-	while( fgets( line, MAXL, f ) != NULL )
+	while( fgets( line, MAX_LINE, f ) != NULL )
 	{
-		// NOTE: What about '4 3abc' ? 'strtok'?
-		if( sscanf( line, "%d %d", &x, &y ) != 2 )
+		// Checking net file format for '<int> <int>\n'
+		if( sscanf( line, "%d %d %n", &x, &y, &pos ) != 2 )
+		{
 			print_error("net");
+		}
+		else if( line[pos] != '\0' )
+		{
+			print_error("net");
+		}
 
 		if( x > n->rows || y > n->cols )
 		{
@@ -53,6 +66,7 @@ net_t *file_to_net( net_t *n, char *filename )
 net_t *random_net( net_t *n )
 {
 	assert( n != NULL );
+
 	srand( time(NULL) );
 
 	n->rows = RANDOM_NET_SIZE;
@@ -95,7 +109,7 @@ void net_to_file( net_t *n, char *filename, char *dir )
 	fprintf( f, "%d %d\n", n->rows, n->cols );
 
 	int x, y;
-	for( int i= 0; i < n->rows * n->cols; i++ )
+	for( int i = 0; i < n->rows * n->cols; i++ )
 	{
 		if( n->vec[i] == 1 )
 		{

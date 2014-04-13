@@ -17,18 +17,10 @@ rules_t *file_to_rules( rules_t *r, char *filename )
 	if( f == NULL )
 		print_error_file( filename );
 
-	fseek( f, 0, SEEK_END );
-	int length = ftell(f) + 1;
-	fseek( f, 0, SEEK_SET );
+	char line[MAX_LINE];
+	fgets( line, MAX_LINE, f );
 
-	char *buffer = calloc( length, sizeof(char) );
-	if( buffer == NULL )
-		print_error("alloc");
-	fgets( buffer, length, f );
-
-	r = string_to_rules( r, buffer );
-	
-	free(buffer);
+	r = string_to_rules( r, line );
 
 	fclose(f);
 
@@ -91,7 +83,7 @@ void rules_to_file( rules_t *r, char *filename, char *dir )
 
 	FILE *f = fopen( path, "w" );
 	if( f == NULL )
-		print_error_file( filename );
+		print_error_file( path );
 	
 	free(path);
 
