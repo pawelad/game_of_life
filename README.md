@@ -1,7 +1,6 @@
-Game of Life
-============
-
-It's a `C` implementation of Conway's [Game of Life](http://en.wikipedia.org/wiki/Conway's_Game_of_Life) simulator made for my university assigment.
+# Game of Life
+C implementation of Conway's [Game of Life](http://en.wikipedia.org/wiki/Conway's_Game_of_Life)
+simulator made for my university assigment.
 
 Main features:
 - read first generation from file
@@ -11,16 +10,14 @@ Main features:
 
 All the options are listed in the [Usage](#usage) section.
 
-##Instalation
-The program is meant to run on Linux.
-
+## Instalation
+The program is meant to run on Linux and wasn't tested on other platforms.  
 Makefile is included, so you can compile it simply by typing `make` in termial, which creates an executable `bin/life_sym` file.
-
 You can also compile it with debug flag `make DEBUG=1 -B` which creates `bin/life_sym_debug` with additional output messages.
 
 You can clean everything up (except results) with `make clean`.
 
-##Usage
+## Usage
 
 ```
 ./life_sym [options]
@@ -36,10 +33,9 @@ You can clean everything up (except results) with `make clean`.
     -m, --mod_file=<str>              path to rules modification file
     -M, --mod_input=<str>             rules modification string   
 ```
-
 Options: `--input`, `--generation_number` and `--photos_number` are required to run program.
 
-##File format
+## File format
 Sample input files are included in the `sample` directory.
 
 ### Netting file
@@ -57,15 +53,17 @@ Rules file is made of:
 
 So the standard rules in that format are `23/3`.
 
-##Used libraries
+## Used libraries
 - [C standard library](http://en.wikipedia.org/wiki/C_standard_library)
 - [C POSIX library](http://en.wikipedia.org/wiki/C_POSIX_library)
-- [libpng](http://www.libpng.org/pub/png/libpng.html) --- saving png files
-- [argparse](https://github.com/Cofyc/argparse) --- parsing arguments (included)
+- [libpng](http://www.libpng.org/pub/png/libpng.html)
+- [argparse](https://github.com/Cofyc/argparse) (included)
 
-##To do
-- generic makefile?
+## Contributions
+Feel free to use, ask, fork, star, report bugs, fix them,
+suggest enhancements and point out any mistakes.
 
-##Suggestions
-It's my first 'proper' programming project, so if you have any suggestion about anything (directory tree, modules, functions, code clarity, comments placement, README file, etc.) then let me know.
-Thanks!
+## Authors
+Developed and maintained by [Paweł Adamczak](https://github.com/pawelad).
+
+Released under [MIT License](LICENSE).
